@@ -1,0 +1,7 @@
+{
+    "v2handlerjs": {
+        "lambda": {
+            "body": "{\"action\": \"GetCheckoutSession\", \"checkoutSessionId\":\"64f20fec-c0a5-4f01-b54f-b7b091bc9a92\", \"idempotencyKey\": \"test\"}"
+        }
+    }
+}
