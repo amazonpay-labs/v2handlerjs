@@ -4,12 +4,13 @@ You can execute amazon pay v2 api on AWS Lambda by using the project.
 
 # Requirements
 * AWS lambda
-* maven
+* node.js
 
 # How To Use
+## How To Request
 set the following json parameter and then execute this project.
 
-## CreateCheckoutSession
+### CreateCheckoutSession
 
 ```
 {
@@ -17,7 +18,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## GetCheckoutSession
+### GetCheckoutSession
 
 ```
 {
@@ -26,7 +27,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## UpdateCheckoutSession
+### UpdateCheckoutSession
 
 ```
 {
@@ -53,7 +54,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## GetChargePermission
+### GetChargePermission
 
 ```
 {
@@ -62,7 +63,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## UpdateChargePermission
+### UpdateChargePermission
 
 ```
 {
@@ -77,7 +78,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## CloseChargePermission
+### CloseChargePermission
 
 ```
 {
@@ -88,7 +89,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## CreateCharge
+### CreateCharge
 
 ```
 {
@@ -104,7 +105,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## GetCharge
+### GetCharge
 
 ```
 {
@@ -113,7 +114,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## CaptureCharge
+### CaptureCharge
 
 ```
 {
@@ -127,7 +128,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## CancelCharge
+### CancelCharge
 
 ```
 {
@@ -137,7 +138,7 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## CreateRefund
+### CreateRefund
 
 ```
 {
@@ -151,11 +152,23 @@ set the following json parameter and then execute this project.
 }
 ```
 
-## GetRefund
+### GetRefund
 
 ```
 {
     "action": "GetRefund",
     "refundId": "S01-5105180-3221187-R022311"
+}
+```
+
+## How To Set idempotencyKey
+add ```idempotencyKey``` in your request json parameter.
+
+For example. If you requet CreateCheckoutSession..
+
+```
+{
+    "action": "CreateCheckoutSession",
+    "idempotencyKey": "XXXXXX"
 }
 ```
