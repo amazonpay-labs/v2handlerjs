@@ -18,22 +18,28 @@ module.exports = {
  */
 /** CreateCheckoutSession */
 // {
-//     "action": "CreateCheckoutSession"
+//     "action": "CreateCheckoutSession",
+//     "webCheckoutDetail": {
+//         "checkoutReviewReturnUrl":"https://a.com/merchant-review-page"
+//     },
+//     "storeId":"amzn1.application-oa2-client.xxxStoreId"
 // }
 const createCheckoutSession = new V2Api('createcheckoutsession', (request, headers) => {
-    const payload = {
-        webCheckoutDetail: {
-            checkoutReviewReturnUrl: process.env.CheckoutReviewReturnUrl
-        },
-        storeId: process.env.StoreId
-    };
+    // const {checkoutReviewReturnUrl, storeId} = config.getCreateCheckoutSessionArgs();
+    
+    // const payload = {
+    //     webCheckoutDetail: {
+    //         checkoutReviewReturnUrl: checkoutReviewReturnUrl
+    //     },
+    //     storeId: storeId
+    // };
     
     headers = headers || {
         'x-amz-pay-idempotency-key': uuidv4().toString().replace(/-/g, '')
     };
 
     return apiCall((payClient) => {
-        return payClient.createCheckoutSession(payload, headers);
+        return payClient.createCheckoutSession(request, headers);
     });
 });
 
@@ -74,8 +80,7 @@ const getCheckoutSession = new V2Api('getcheckoutsession', (request, headers) =>
 const updateCheckoutSession = new V2Api('updatecheckoutsession', (request, headers) => {
     return apiCall((payClient) => {
         const checkoutSessionId = request.checkoutSessionId;
-        delete request["checkoutSessionId"];
-        return payClient.updateCheckoutSession(checkoutSessionId, request, headers);
+        return payClient.updateCheckoutSession(checkoutSessionId, takePropertyOut(request, "checkoutSessionId"), headers);
     });
 });
 
@@ -104,8 +109,7 @@ const getChargePermission = new V2Api('getchargepermission', (request, headers) 
 const updateChargePermission = new V2Api('updatechargepermission', (request, headers) => {
     return apiCall((payClient) => {
         const chargePermissionId = request.chargePermissionId;
-        delete request["chargePermissionId"];
-        return payClient.updateChargePermission(chargePermissionId, request, headers);
+        return payClient.updateChargePermission(chargePermissionId, takePropertyOut(request, "chargePermissionId"), headers);
     });
 });
 
@@ -119,8 +123,7 @@ const updateChargePermission = new V2Api('updatechargepermission', (request, hea
 const closeChargePermission = new V2Api('closechargepermission', (request, headers) => {
     return apiCall((payClient) => {
         const chargePermissionId = request.chargePermissionId;
-        delete request["chargePermissionId"];
-        return payClient.closeChargePermission(chargePermissionId, request, headers);
+        return payClient.closeChargePermission(chargePermissionId, takePropertyOut(request, "chargePermissionId"), headers);
     });
 });
 
@@ -166,8 +169,7 @@ const getCharge = new V2Api('getcharge', (request, headers) => {
 const captureCharge = new V2Api('capturecharge', (request, headers) => {
     return apiCall((payClient) => {
         const chargeId = request.chargeId;
-        delete request["chargeId"];
-        return payClient.captureCharge(chargeId, request, headers);
+        return payClient.captureCharge(chargeId, takePropertyOut(request, "chargeId"), headers);
     });
 });
 
@@ -180,8 +182,7 @@ const captureCharge = new V2Api('capturecharge', (request, headers) => {
 const cancelCharge = new V2Api('cancelcharge', (request, headers) => {
     return apiCall((payClient) => {
         const chargeId = request.chargeId;
-        delete request["chargeId"];
-        return payClient.cancelCharge(chargeId, request, headers);
+        return payClient.cancelCharge(chargeId, takePropertyOut(request, "chargeId"), headers);
     });
 }); 
 
@@ -215,12 +216,16 @@ const getRefund = new V2Api('getrefund', (request, headers) => {
 /**
  * Api caller
  */
+let payClient = null;
 function apiCall(apiRequest) {
     try {
-        const payClient = new Client.WebStoreClient(config.getArgs());
+        if(payClient == null) {
+            payClient = new Client.WebStoreClient(config.getApiClientArgs());    
+        }
         return apiRequest(payClient);
     } catch(err) {
         console.error(err);
+        console.error(err.stack);
         throw Error(err);
     }
 }
@@ -250,10 +255,16 @@ function execute(apiName, request = {}, headers = {}) {
     }
 
     try {
-        console.log(v2Interface);
         return v2Interface.get(apiName).call(request, headers);
     } catch(err) {
         console.error(err);
-        throw Error("Api doesn't exist.");
+        console.error(err.stack);
+        throw Error(`Api doesn't exist. ApiName:${apiName} Request:${request}`);
     }
+}
+
+function takePropertyOut(target, propName) {
+    const value = target[propName];
+    delete target[propName];
+    return target;
 }

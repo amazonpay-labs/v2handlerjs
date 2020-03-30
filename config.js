@@ -2,10 +2,18 @@
  * v2 api configration
  */ 
 module.exports = {
-    getArgs : getArgs
+    getApiClientArgs : getApiClientArgs,
+    getCreateCheckoutSessionArgs : getCreateCheckoutSessionArgs
 };
 
-function getArgs() {
+function getCreateCheckoutSessionArgs() {
+    return {
+        checkoutReviewReturnUrl: process.env.CheckoutReviewReturnUrl,
+        storeId: process.env.StoreId
+    }
+}
+
+function getApiClientArgs() {
 
     let config = {
         publicKeyId: process.env.PublicKeyId,

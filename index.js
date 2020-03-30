@@ -16,7 +16,7 @@ exports.handler = (event, context, callback) => {
         console.log(`[request]${event.body}`);
         
         const request = JSON.parse(event.body);
-        
+
         const apiName = request.action.toLowerCase();
         delete request["action"];
 
@@ -35,6 +35,7 @@ exports.handler = (event, context, callback) => {
             context.succeed(new Response(200, res.body));
         }).catch(err => {
             console.error(err);
+            console.error(err.stack);
             const message = err.message ? err.message : err.body ? err.body : "unknown error";
             
             context.done(null, new Response(500, {"message": `${apiName}: An unexpected error has occurred.`, "error": message}));
