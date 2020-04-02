@@ -2,16 +2,8 @@
  * v2 api configration
  */ 
 module.exports = {
-    getApiClientArgs : getApiClientArgs,
-    getCreateCheckoutSessionArgs : getCreateCheckoutSessionArgs
+    getApiClientArgs : getApiClientArgs
 };
-
-function getCreateCheckoutSessionArgs() {
-    return {
-        checkoutReviewReturnUrl: process.env.CheckoutReviewReturnUrl,
-        storeId: process.env.StoreId
-    }
-}
 
 function getApiClientArgs() {
 

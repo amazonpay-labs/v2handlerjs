@@ -2,7 +2,6 @@
  * Settings
  */
 // V2 api modules
-const { v4: uuidv4 } = require('uuid');
 const Client = require('../sdk/client');
 const {V2Interface, V2Api} = require('./v2Interface');
 
@@ -25,19 +24,6 @@ module.exports = {
 //     "storeId":"amzn1.application-oa2-client.xxxStoreId"
 // }
 const createCheckoutSession = new V2Api('createcheckoutsession', (request, headers) => {
-    // const {checkoutReviewReturnUrl, storeId} = config.getCreateCheckoutSessionArgs();
-    
-    // const payload = {
-    //     webCheckoutDetail: {
-    //         checkoutReviewReturnUrl: checkoutReviewReturnUrl
-    //     },
-    //     storeId: storeId
-    // };
-    
-    headers = headers || {
-        'x-amz-pay-idempotency-key': uuidv4().toString().replace(/-/g, '')
-    };
-
     return apiCall((payClient) => {
         return payClient.createCheckoutSession(request, headers);
     });
@@ -224,7 +210,7 @@ function apiCall(apiRequest) {
         }
         return apiRequest(payClient);
     } catch(err) {
-        console.error(err);
+        console.error('apiCall(v2Handler) error occurred.');
         console.error(err.stack);
         throw Error(err);
     }
@@ -257,9 +243,10 @@ function execute(apiName, request = {}, headers = {}) {
     try {
         return v2Interface.get(apiName).call(request, headers);
     } catch(err) {
-        console.error(err);
+        console.error('execute(v2Interface) error occurred.');
+        console.error(err.body);
         console.error(err.stack);
-        throw Error(`Api doesn't exist. ApiName:${apiName} Request:${request}`);
+        throw Error(`Api doesn't exist. ApiName:${apiName} Request:${request} Response:${err.body}`);
     }
 }
 

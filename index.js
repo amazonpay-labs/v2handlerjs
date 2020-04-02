@@ -1,6 +1,8 @@
 /**
  * Settings
  */
+ const { v4: uuidv4 } = require('uuid');
+ 
 // Log Level
 console.log = console.log.bind(null, '[LOG]');
 console.error = console.error.bind(null, '[ERR]');
@@ -26,6 +28,10 @@ exports.handler = (event, context, callback) => {
                 'x-amz-pay-idempotency-key': request.idempotencyKey
             };
             delete request["idempotencyKey"];
+        } else {
+            headers =  {
+                'x-amz-pay-idempotency-key': uuidv4().toString().replace(/-/g, '')
+            };
         }
         
         const apiCall = V2Handler.execute(apiName, request, headers);
@@ -34,18 +40,25 @@ exports.handler = (event, context, callback) => {
             console.log(`[response]${res.body}`);
             context.succeed(new Response(200, res.body));
         }).catch(err => {
-            console.error(err);
-            console.error(err.stack);
-            const message = err.message ? err.message : err.body ? err.body : "unknown error";
+            const error = err.body || "unknown error";
+            console.error(error);
             
-            context.done(null, new Response(500, {"message": `${apiName}: An unexpected error has occurred.`, "error": message}));
+            const reqponse = {
+                "message": `${apiName}: An unexpected error has occurred. ${error}`,
+            }
+
+            context.done(null, new Response(500, JSON.stringify(reqponse)));
         });
         
     } catch(err) {
-        console.error(err);
-        const message = err.message ? err.message : err.body ? err.body : "unknown error.";
+        const error = err.body || "unknown error";
+        console.error(error);
         
-        context.done(null, new Response(500, {"message": "An unexpected error has occurred", "error": message}));
+        const reqponse = {
+            "message": `An unexpected error has occurred. ${error}`,
+        }
+
+        context.done(null, new Response(500, JSON.stringify(reqponse)));
     }
 
 };
