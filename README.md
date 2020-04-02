@@ -14,7 +14,11 @@ set the following json parameter and then execute this project.
 
 ```
 {
-    "action": "CreateCheckoutSession"
+    "action": "CreateCheckoutSession",
+    "webCheckoutDetail": {
+        "checkoutReviewReturnUrl":"https://a.com/merchant-review-page"
+    },
+    "storeId":"amzn1.application-oa2-client.xxxStoreId"
 }
 ```
 
