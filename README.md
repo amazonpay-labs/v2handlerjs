@@ -173,6 +173,7 @@ For example. If you requet CreateCheckoutSession..
 ```
 {
     "action": "CreateCheckoutSession",
-    "idempotencyKey": "XXXXXX"
+    "idempotencyKey": "XXXXXX",
+    ...
 }
 ```
