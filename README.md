@@ -12,6 +12,8 @@ set the following json parameter and then execute this project.
 
 ### CreateCheckoutSession
 
+#### Request body
+
 ```
 {
     "action": "CreateCheckoutSession",
@@ -22,7 +24,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[CreateCheckoutSession response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/checkout-session.html#create-checkout-session)
+
 ### GetCheckoutSession
+
+#### Request body
 
 ```
 {
@@ -31,7 +38,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[GetCheckoutSession response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/checkout-session.html#get-checkout-session)
+
 ### UpdateCheckoutSession
+
+#### Request body
 
 ```
 {
@@ -58,7 +70,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[UpdateCheckoutSession response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/checkout-session.html#update-checkout-session)
+
 ### GetChargePermission
+
+#### Request body
 
 ```
 {
@@ -67,7 +84,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[GetChargePermission response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge-permission.html#get-charge-permission)
+
 ### UpdateChargePermission
+
+#### Request body
 
 ```
 {
@@ -82,7 +104,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[UpdateChargePermission response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge-permission.html#update-charge-permission)
+
 ### CloseChargePermission
+
+#### Request body
 
 ```
 {
@@ -93,7 +120,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[CloseChargePermission response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge-permission.html#close-charge-permission)
+
 ### CreateCharge
+
+#### Request body
 
 ```
 {
@@ -109,7 +141,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[CreateCharge response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge.html#create-charge)
+
 ### GetCharge
+
+#### Request body
 
 ```
 {
@@ -118,7 +155,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[GetCharge response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge.html#get-charge)
+
 ### CaptureCharge
+
+#### Request body
 
 ```
 {
@@ -132,7 +174,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[CaptureCharge response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge.html#capture-charge)
+
 ### CancelCharge
+
+#### Request body
 
 ```
 {
@@ -142,7 +189,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[CancelCharge response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/charge.html#cancel-charge)
+
 ### CreateRefund
+
+#### Request body
 
 ```
 {
@@ -156,7 +208,12 @@ set the following json parameter and then execute this project.
 }
 ```
 
+#### Response
+[CreateRefund response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/refund.html#create-refund)
+
 ### GetRefund
+
+#### Request body
 
 ```
 {
@@ -164,6 +221,9 @@ set the following json parameter and then execute this project.
     "refundId": "S01-5105180-3221187-R022311"
 }
 ```
+
+#### Response
+[GetRefund response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/refund.html#get-refund)
 
 ## How To Set idempotencyKey
 add ```idempotencyKey``` in your request json parameter.
