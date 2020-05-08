@@ -13,7 +13,8 @@ class AmazonPayClient {
      * @param {String} options.method - The HTTP request method
      * @param {String} options.urlFragment - The URI for the API Call
      * @param {String} [options.payload=null] - The payload for the API Call
-     * @param {String} [options.headers=null] - The headers for the API Call
+     * @param {Object} [options.headers=null] - The headers for the API Call
+     * @param {Object} [options.queryParams=null] - The headers for the API Call
      **/
     apiCall(options) {
         const preparedOptions = helper.prepareOptions(this.configArgs, options);
@@ -27,11 +28,37 @@ class AmazonPayClient {
      * @param {String} options.method - The HTTP request method
      * @param {String} options.urlFragment - The URI for the API Call
      * @param {String} [options.payload=null] - The payload for the API Call
-     * @param {String} [options.headers=null] - The headers for the API Call
+     * @param {Object} [options.headers=null] - The headers for the API Call
      **/
     getSignedHeaders(options) {
         const preparedOptions = helper.prepareOptions(this.configArgs, options);
         return helper.signHeaders(this.configArgs, preparedOptions);
+    }
+
+    /** Lets the solution provider get Authorization Token for their merchants if they are granted the delegation.
+     *   - Please note that your solution provider account must have a pre-existing relationship (valid and active MWS authorization token) with the merchant account in order to use this function.
+     * @param {String} mwsAuthToken - The mwsAuthToken
+     * @param {String} merchantId - The MerchantId
+     * @param {Object} [headers=null] - The headers for the request
+     **/
+    getAuthorizationToken(mwsAuthToken, merchantId, headers = null) {
+        return this.apiCall({
+            method: 'GET',
+            urlFragment: `authorizationTokens/${mwsAuthToken}`,
+            headers: headers,
+            queryParams: {
+                merchantId: merchantId
+            }
+        });
+    }
+
+    /** Generates static signature for amazon.Pay.renderButton used by checkout.js.
+     *   - Returns signature as string.
+     * @param {Object} payload - The payload for the request
+     * @returns {String} signature
+     **/
+    generateButtonSignature(payload) {
+        return helper.signPayload(this.configArgs, payload);
     }
 
     /** Lets the solution provider make the DeliveryTrackers request with their auth token.
@@ -46,7 +73,7 @@ class AmazonPayClient {
     deliveryTrackers(payload, headers = null) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'v1/deliveryTrackers',
+            urlFragment: 'deliveryTrackers',
             payload: payload,
             headers: headers
         });
@@ -67,7 +94,7 @@ class InStoreClient extends AmazonPayClient {
     merchantScan(payload, headers = null) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'in-store/v1/merchantScan',
+            urlFragment: 'in-store/merchantScan',
             payload: payload,
             headers: headers
         });
@@ -82,7 +109,7 @@ class InStoreClient extends AmazonPayClient {
     charge(payload, headers = null) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'in-store/v1/charge',
+            urlFragment: 'in-store/charge',
             payload: payload,
             headers: headers
         });
@@ -97,7 +124,7 @@ class InStoreClient extends AmazonPayClient {
     refund(payload, headers = null) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'in-store/v1/refund',
+            urlFragment: 'in-store/refund',
             payload: payload,
             headers: headers
         });
@@ -118,7 +145,7 @@ class WebStoreClient extends AmazonPayClient {
     createCheckoutSession(payload, headers) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'v1/checkoutSessions',
+            urlFragment: 'checkoutSessions',
             payload: payload,
             headers: headers
         });
@@ -133,7 +160,7 @@ class WebStoreClient extends AmazonPayClient {
     getCheckoutSession(checkoutSessionId, headers = null) {
         return this.apiCall({
             method: 'GET',
-            urlFragment: `v1/checkoutSessions/${checkoutSessionId}`,
+            urlFragment: `checkoutSessions/${checkoutSessionId}`,
             headers: headers
         });
     }
@@ -148,7 +175,23 @@ class WebStoreClient extends AmazonPayClient {
     updateCheckoutSession(checkoutSessionId, payload, headers = null) {
         return this.apiCall({
             method: 'PATCH',
-            urlFragment: `v1/checkoutSessions/${checkoutSessionId}`,
+            urlFragment: `checkoutSessions/${checkoutSessionId}`,
+            payload: payload,
+            headers: headers
+        });
+    }
+
+    /** API to complete a Checkout Session
+     *   - Confirms the completion of buyer checkout.
+     * @see //TODO Update Live URL
+     * @param {String} checkoutSessionId - The checkout session Id
+     * @param {Object} payload - The payload for the request
+     * @param {Object} [headers=null] - The headers for the request
+     **/
+    completeCheckoutSession(checkoutSessionId, payload, headers = null) {
+        return this.apiCall({
+            method: 'POST',
+            urlFragment: `checkoutSessions/${checkoutSessionId}/complete`,
             payload: payload,
             headers: headers
         });
@@ -163,7 +206,7 @@ class WebStoreClient extends AmazonPayClient {
     getChargePermission(chargePermissionId, headers = null) {
         return this.apiCall({
             method: 'GET',
-            urlFragment: `v1/chargePermissions/${chargePermissionId}`,
+            urlFragment: `chargePermissions/${chargePermissionId}`,
             headers: headers
         });
     }
@@ -178,7 +221,7 @@ class WebStoreClient extends AmazonPayClient {
     updateChargePermission(chargePermissionId, payload, headers = null) {
         return this.apiCall({
             method: 'PATCH',
-            urlFragment: `v1/chargePermissions/${chargePermissionId}`,
+            urlFragment: `chargePermissions/${chargePermissionId}`,
             payload: payload,
             headers: headers
         });
@@ -194,7 +237,7 @@ class WebStoreClient extends AmazonPayClient {
     closeChargePermission(chargePermissionId, payload, headers = null) {
         return this.apiCall({
             method: 'DELETE',
-            urlFragment: `v1/chargePermissions/${chargePermissionId}/close`,
+            urlFragment: `chargePermissions/${chargePermissionId}/close`,
             payload: payload,
             headers: headers
         });
@@ -209,7 +252,7 @@ class WebStoreClient extends AmazonPayClient {
     createCharge(payload, headers) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'v1/charges',
+            urlFragment: 'charges',
             payload: payload,
             headers: headers
         });
@@ -224,7 +267,7 @@ class WebStoreClient extends AmazonPayClient {
     getCharge(chargeId, headers = null) {
         return this.apiCall({
             method: 'GET',
-            urlFragment: `v1/charges/${chargeId}`,
+            urlFragment: `charges/${chargeId}`,
             headers: headers
         });
     }
@@ -239,7 +282,7 @@ class WebStoreClient extends AmazonPayClient {
     captureCharge(chargeId, payload, headers = null) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: `v1/charges/${chargeId}/capture`,
+            urlFragment: `charges/${chargeId}/capture`,
             payload: payload,
             headers: headers
         });
@@ -255,7 +298,7 @@ class WebStoreClient extends AmazonPayClient {
     cancelCharge(chargeId, payload, headers = null) { 
         return this.apiCall({
             method: 'DELETE',
-            urlFragment: `v1/charges/${chargeId}/cancel`,
+            urlFragment: `charges/${chargeId}/cancel`,
             payload: payload,
             headers: headers
         });
@@ -270,7 +313,7 @@ class WebStoreClient extends AmazonPayClient {
     createRefund(payload, headers) {
         return this.apiCall({
             method: 'POST',
-            urlFragment: 'v1/refunds',
+            urlFragment: 'refunds',
             payload: payload,
             headers: headers
         });
@@ -285,7 +328,7 @@ class WebStoreClient extends AmazonPayClient {
     getRefund(refundId, headers = null) {
         return this.apiCall({
             method: 'GET',
-            urlFragment: `v1/refunds/${refundId}`,
+            urlFragment: `refunds/${refundId}`,
             headers: headers
         });
     }

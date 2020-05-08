@@ -70,6 +70,22 @@ const updateCheckoutSession = new V2Api('updatecheckoutsession', (request, heade
     });
 });
 
+/** CompleteCheckoutSession */
+// {
+//     "action": "CompleteCheckoutSession",
+//     "checkoutSessionId":"XXX",
+//     "chargeAmount": {
+//         "amount":"14.00",
+//         "currencyCode":"USD"
+//     }
+// }
+const completeCheckoutSession = new V2Api('completecheckoutsession', (request, headers) => {
+    return apiCall((payClient) => {
+        const checkoutSessionId = request.checkoutSessionId;
+        return payClient.completeCheckoutSession(checkoutSessionId, takePropertyOut(request, "checkoutSessionId"), headers);
+    });
+});
+
 /** GetChargePermission */
 // {
 //     "action": "GetChargePermission",
@@ -225,6 +241,7 @@ function execute(apiName, request = {}, headers = {}) {
             createCheckoutSession, 
             getCheckoutSession,
             updateCheckoutSession,
+            completeCheckoutSession,
             // chrgePermission
             getChargePermission,
             updateChargePermission,

@@ -6,6 +6,7 @@ const request = require('request');
 
 module.exports = {
     signHeaders: signHeaders,
+    signPayload: signPayload,
     retryLogic: retryLogic,
     sendRequest: sendRequest,
     invokeApi: invokeApi,
@@ -17,19 +18,38 @@ function getTimestamp() {
     return date.toISOString().split('.')[0] + 'Z';
 }
 
+function getAPIEndpointBaseURL (region) {
+    return constants.API_ENDPOINTS[constants.REGION_MAP[region.toLowerCase()]];
+}
+
 function invokeApi(configArgs, apiOptions) {
 
     const options = {
         method: apiOptions.method,
         json: false,
         headers: apiOptions.headers,
-        url: `https://${constants.REGION_MAP[configArgs.region.toLowerCase()]}/${apiOptions.urlFragment}`,
+        url: `https://${getAPIEndpointBaseURL(configArgs.region)}/${apiOptions.urlFragment}${getQueryString(apiOptions.queryParams)}`,
         body: apiOptions.payload
     };
 
     const response = this.retryLogic(options, 1);
 
     return response;
+}
+
+function getQueryString(requestParams) {
+    if (requestParams) return `?${getParametersAsString(requestParams)}`;
+    return ''; 
+}
+
+function getParametersAsString(requestParams) {
+    if (!requestParams) return '';
+
+    let queryParams = [];
+    Object.keys(requestParams).forEach(function (param) {
+        queryParams.push(`${param}=${encodeURIComponent(requestParams[param])}`);
+    });
+    return queryParams.join('&');
 }
 
 function prepareOptions(configArgs, options) {
@@ -41,9 +61,9 @@ function prepareOptions(configArgs, options) {
     }
 
     if (configArgs['sandbox'] === true || configArgs['sandbox'] === 'true') {
-        options.urlFragment = `sandbox/${options.urlFragment}`;
+        options.urlFragment = `sandbox/${constants.API_VERSION}/${options.urlFragment}`;
     } else {
-        options.urlFragment = `live/${options.urlFragment}`;
+        options.urlFragment = `live/${constants.API_VERSION}/${options.urlFragment}`;
     }
     return options;
 }
@@ -109,11 +129,11 @@ function signHeaders(configArgs, options) {
     Object.assign(headers, options.headers);
 
     headers['x-amz-pay-region'] = configArgs.region;
-    headers['x-amz-pay-host'] =  constants.REGION_MAP[configArgs.region.toLowerCase()];
+    headers['x-amz-pay-host'] =  getAPIEndpointBaseURL(configArgs.region);
     headers['x-amz-pay-date'] = getTimestamp();
     headers['content-type'] =  'application/json';
     headers['accept'] = 'application/json';
-    headers['user-agent'] = `amazon-pay-sdk-nodejs/${constants.VERSION} (JS/${process.versions.node}; ${process.platform})`;
+    headers['user-agent'] = `amazon-pay-api-sdk-nodejs/${constants.SDK_VERSION} (JS/${process.versions.node}; ${process.platform})`;
 
     const lowercaseSortedHeaderKeys = Object.keys(headers).sort(function (a, b) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
@@ -121,11 +141,13 @@ function signHeaders(configArgs, options) {
     const signedHeaders = lowercaseSortedHeaderKeys.join(';');
 
     let payload = options.payload;
-    if (payload === null || payload === undefined || options.urlFragment.includes('/account-management/v1/accounts')) {
+    if (payload === null || payload === undefined || options.urlFragment.includes(`/account-management/${constants.API_VERSION}/accounts`)) {
         payload = ''; // do not sign payload for payment critical data APIs
     }
 
-    let canonicalRequest = options.method + '\n/' + options.urlFragment + '\n\n';
+    let canonicalRequest = options.method + '\n/'
+        + options.urlFragment + '\n'
+        + getParametersAsString(options.queryParams) + '\n';
     lowercaseSortedHeaderKeys.forEach(item => canonicalRequest += item.toLowerCase() + ':' + headers[item] + '\n');
     canonicalRequest += '\n' + signedHeaders + '\n' + crypto.createHash('SHA256').update(payload).digest('hex');
 
@@ -140,4 +162,15 @@ function signHeaders(configArgs, options) {
         + ', Signature=' + signature;
 
    return headers;
+}
+
+function signPayload(configArgs, payload) {
+    // if user doesn't pass in a string, assume it's a JS object and convert it to a JSON string
+    if (!(typeof payload === 'string' || payload instanceof String)) {
+        payload = JSON.stringify(payload);
+    }
+    const stringToSign = constants.AMAZON_SIGNATURE_ALGORITHM + '\n' +
+        crypto.createHash('SHA256').update(payload).digest('hex');
+
+    return sign(configArgs.privateKey, stringToSign);
 }
