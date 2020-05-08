@@ -73,6 +73,24 @@ set the following json parameter and then execute this project.
 #### Response
 [UpdateCheckoutSession response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/checkout-session.html#update-checkout-session)
 
+### CompleteCheckoutSession
+
+#### Request body
+
+```
+{
+    "action": "CompleteCheckoutSession",
+    "checkoutSessionId":"XXX",
+    "chargeAmount": {
+        "amount":"14.00",
+        "currencyCode":"USD"
+    }
+}
+```
+
+#### Response
+[CompleteCheckoutSession response](http://amazonpaycheckoutintegrationguide.s3.amazonaws.com/amazon-pay-api-v2/checkout-session.html#complete-checkout-session)
+
 ### GetChargePermission
 
 #### Request body
